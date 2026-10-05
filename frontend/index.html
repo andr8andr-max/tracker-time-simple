@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2563eb">
+  <title>Мой день — Тайм-трекер</title>
+  <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <span class="topbar-brand">Тайм-трекер</span>
+    <div class="topbar-actions">
+      <span class="topbar-user" id="userLabel"></span>
+      <a class="btn btn-sm" id="adminLink" href="/admin" hidden>Панель руководителя</a>
+      <button class="btn btn-sm btn-ghost" id="logoutBtn" type="button">Выйти</button>
+    </div>
+  </header>
+
+  <main class="container" style="max-width: 720px">
+    <div id="alertBox" hidden></div>
+
+    <!-- ================= Таймер / запуск работы ================= -->
+    <section class="card" id="timerCard">
+      <!-- Вариант 1: таймер запущен -->
+      <div id="runningBlock" hidden>
+        <div class="card-title-row">
+          <h2 class="h2" id="runningTitle">Идёт работа</h2>
+          <span class="badge badge-running" id="runningBadge">запущено</span>
+        </div>
+        <div class="timer-face" id="elapsed">0:00:00</div>
+        <p class="timer-meta" id="runningMeta"></p>
+        <div class="timer-actions">
+          <button class="btn btn-block" id="pauseBtn" type="button">Пауза</button>
+          <button class="btn btn-block btn-stop" id="stopBtn" type="button">Завершить работу</button>
+        </div>
+      </div>
+
+      <!-- Вариант 2: таймер не запущен -->
+      <div id="idleBlock">
+        <h2 class="h2">Начать работу</h2>
+        <div class="form-grid">
+          <div class="field">
+            <label class="label" for="startProject">Проект</label>
+            <select class="input" id="startProject" required></select>
+          </div>
+          <div class="field">
+            <label class="label" for="startTask">Задача / работа</label>
+            <input class="input" id="startTask" type="text" maxlength="200"
+                   placeholder="Например: правки лендинга" autocomplete="off">
+          </div>
+          <p class="error-text" id="startError" hidden></p>
+          <button class="btn btn-block btn-start" id="startBtn" type="button">Начать работу</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Незавершённые записи за сегодня ============= -->
+    <section class="card" id="unfinishedCard" hidden>
+      <h2 class="h3">Незавершённые записи за сегодня</h2>
+      <ul class="list" id="unfinishedList"></ul>
+    </section>
+
+    <!-- ================== Ручной ввод ========================== -->
+    <section class="card" id="manualCard" hidden>
+      <h2 class="h3">Ручной ввод</h2>
+      <form id="manualForm" class="form-grid" novalidate>
+        <div class="field">
+          <label class="label" for="mDate">Дата</label>
+          <input class="input" id="mDate" type="date" required>
+        </div>
+
+        <div class="field">
+          <label class="label" for="mProject">Проект</label>
+          <select class="input" id="mProject" required></select>
+        </div>
+
+        <div class="field">
+          <label class="label" for="mTask">Задача / работа</label>
+          <input class="input" id="mTask" type="text" maxlength="200"
+                 placeholder="Что делали?" autocomplete="off" required>
+        </div>
+
+        <div class="form-grid two-col">
+          <div class="field">
+            <label class="label" for="mStart">Время начала</label>
+            <input class="input" id="mStart" type="time" required>
+          </div>
+          <div class="field">
+            <label class="label" for="mEnd">Время окончания</label>
+            <input class="input" id="mEnd" type="time" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label" for="mBreak">Перерыв (минуты)</label>
+          <input class="input" id="mBreak" type="number" min="0" max="1440"
+                 step="1" value="0" inputmode="numeric">
+        </div>
+
+        <label class="checkbox-row" for="mOvernight">
+          <input type="checkbox" id="mOvernight">
+          <span>Смена через полночь (например, 22:00 – 02:00)</span>
+        </label>
+
+        <div class="field">
+          <label class="label" for="mNotes">Примечания</label>
+          <textarea class="input" id="mNotes" maxlength="2000"
+                    placeholder="Необязательно"></textarea>
+        </div>
+
+        <p class="error-text" id="formError" hidden></p>
+        <p class="alert alert-success" id="formSuccess" hidden>Данные сохранены</p>
+
+        <div class="form-actions">
+          <button class="btn btn-primary btn-block" type="submit">Сохранить</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ============== Все записи за сегодня ===================== -->
+    <section class="card">
+      <div class="card-title-row">
+        <h2 class="h3">Мои записи за сегодня</h2>
+        <span class="muted" id="todayTotal"></span>
+      </div>
+      <div id="todayList"></div>
+    </section>
+  </main>
+
+  <script src="/static/js/api.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

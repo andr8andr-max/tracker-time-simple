@@ -1,0 +1,464 @@
+/* =========================================================================
+   Тайм-трекер — стили. Mobile-first, без внешних UI-фреймворков.
+   ========================================================================= */
+
+:root {
+  --bg: #f2f5f9;
+  --surface: #ffffff;
+  --text: #16202e;
+  --muted: #67748a;
+  --border: #dfe6ef;
+  --primary: #2563eb;
+  --primary-dark: #1d4ed8;
+  --success: #15803d;
+  --success-dark: #166534;
+  --danger: #dc2626;
+  --warning-bg: #fff7ed;
+  --radius: 14px;
+  --shadow: 0 1px 2px rgba(16, 32, 46, 0.06), 0 8px 24px rgba(16, 32, 46, 0.06);
+}
+
+* { box-sizing: border-box; }
+
+/* Атрибут hidden должен побеждать любые display-правила классов
+   (.btn { display:inline-flex }, .form-grid { display:grid } и т.п.) */
+[hidden] { display: none !important; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; /* нет горизонтальной прокрутки */
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.45;
+  -webkit-text-size-adjust: 100%;
+}
+
+h1, h2, h3 { margin: 0 0 .5em; line-height: 1.25; font-weight: 650; }
+.h1 { font-size: 1.5rem; }
+.h2 { font-size: 1.25rem; }
+.h3 { font-size: 1.05rem; }
+
+p { margin: 0 0 .8em; }
+a { color: var(--primary); }
+
+.muted { color: var(--muted); font-size: .92rem; }
+.hidden { display: none !important; }
+
+/* --- Разметка ------------------------------------------------------------ */
+
+.container {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 14px 14px 48px;
+}
+
+.container.narrow { max-width: 460px; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px;
+  margin-bottom: 14px;
+}
+
+.card-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+/* --- Верхняя панель ------------------------------------------------------ */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 14px;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.topbar-brand { font-weight: 700; font-size: 1.05rem; }
+.topbar-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.topbar-user { font-size: .9rem; color: var(--muted); }
+
+/* --- Кнопки -------------------------------------------------------------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background .15s ease, border-color .15s ease, transform .05s ease;
+}
+
+.btn:active { transform: translateY(1px); }
+.btn:focus-visible { outline: 3px solid rgba(37, 99, 235, .35); outline-offset: 2px; }
+.btn[disabled] { opacity: .55; cursor: not-allowed; }
+
+.btn-primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-dark); }
+
+.btn-danger { background: #fff; border-color: #f3c1c1; color: var(--danger); }
+.btn-danger:hover { background: #fef2f2; }
+
+.btn-ghost { background: transparent; }
+
+.btn-sm { min-height: 36px; padding: 6px 12px; font-size: .9rem; border-radius: 10px; }
+
+.btn-block { width: 100%; }
+
+/* Большая кнопка «Начать работу» — главный элемент экрана сотрудника */
+.btn-start {
+  min-height: 64px;
+  font-size: 1.2rem;
+  border-radius: 16px;
+  background: var(--success);
+  border-color: var(--success);
+  color: #fff;
+  letter-spacing: .01em;
+}
+.btn-start:hover { background: var(--success-dark); }
+
+.btn-stop {
+  min-height: 56px;
+  font-size: 1.05rem;
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+}
+
+/* --- Формы --------------------------------------------------------------- */
+
+.form-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+
+.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+
+.label {
+  font-size: .88rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.input,
+.input select,
+.input textarea {
+  width: 100%;
+  min-height: 50px;
+  padding: 12px 14px;
+  font-size: 16px; /* 16px — чтобы iOS не зумил страницу */
+  font-family: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  appearance: none;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, .18);
+}
+
+.input::placeholder { color: #9aa5b6; }
+
+textarea.input { min-height: 96px; resize: vertical; }
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 46px;
+  font-size: .95rem;
+}
+
+.checkbox-row input[type="checkbox"] {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--primary);
+}
+
+.form-actions { display: flex; flex-direction: column; gap: 10px; }
+
+.error-text {
+  color: var(--danger);
+  font-size: .92rem;
+  margin: 0;
+}
+
+/* --- Сообщения ----------------------------------------------------------- */
+
+/* Всплывающие сообщения лежат поверх страницы и НЕ сдвигают плитки */
+#alertBox {
+  position: fixed;
+  top: 62px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(1180px, calc(100vw - 24px));
+  z-index: 60;
+  pointer-events: none;
+}
+
+#alertBox .alert {
+  pointer-events: auto;
+  margin-bottom: 0;
+  box-shadow: 0 10px 30px rgba(16, 32, 46, .16);
+}
+
+.alert {
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  font-size: .95rem;
+  border: 1px solid transparent;
+}
+.alert-error { background: #fef2f2; border-color: #f6c9c9; color: #991b1b; }
+.alert-success { background: #f0fdf4; border-color: #c6ecd1; color: #166534; }
+.alert-info { background: #eff6ff; border-color: #cfe0fb; color: #1e40af; }
+
+/* Отступ между блоками форм на странице входа */
+#loginForm, #setupForm { margin-top: 18px; }
+#loginForm + #setupForm { margin-top: 26px; }
+.login-hint { margin-top: 18px; }
+
+/* --- Таймер -------------------------------------------------------------- */
+
+.timer-face {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 10px;
+  font-variant-numeric: tabular-nums;
+  font-size: 2.6rem;
+  font-weight: 700;
+  margin: 6px 0 4px;
+}
+
+.timer-meta { text-align: center; color: var(--muted); margin-bottom: 14px; }
+.timer-meta strong { color: var(--text); }
+
+/* Кнопки управления таймером — рядом, каждая занимает половину плитки */
+.timer-actions {
+  display: flex;
+  gap: 10px;
+}
+.timer-actions .btn {
+  flex: 1 1 0;
+  width: auto;
+  min-width: 0;
+  text-align: center;
+}
+
+/* --- Список записей ------------------------------------------------------ */
+
+.list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+
+.record-item {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  background: #fbfcfe;
+}
+
+.record-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.record-task { font-weight: 600; word-break: break-word; }
+.record-sub { color: var(--muted); font-size: .9rem; margin-top: 4px; word-break: break-word; }
+.record-hours { font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.record-actions { margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; }
+
+.badge {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: .78rem;
+  font-weight: 700;
+  background: #eef2f7;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.badge-running { background: #dcfce7; color: #166534; }
+.badge-paused { background: #fef3c7; color: #92400e; }
+.badge-admin { background: #e0eaff; color: #1d4ed8; }
+.badge-off { background: #f3f4f6; color: #6b7280; }
+
+.empty {
+  text-align: center;
+  color: var(--muted);
+  padding: 18px 8px;
+  font-size: .95rem;
+}
+
+/* --- Вкладки админки ----------------------------------------------------- */
+
+.tabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  margin-bottom: 14px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tab {
+  flex: 0 0 auto;
+  min-height: 44px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: .95rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.tab[aria-selected="true"] {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+/* --- Фильтры ------------------------------------------------------------- */
+
+.filters {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+/* Кнопки фильтров занимают всю ширину — «Применить», «Сбросить»,
+   «Экспорт CSV» всегда в одном ряду */
+.filters-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.filters-actions .btn { flex: 0 1 auto; }
+
+/* --- Таблица ------------------------------------------------------------- */
+
+.table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+table.data {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .92rem;
+  min-width: 900px; /* на узких экранах прокручивается горизонтально */
+}
+
+table.data th,
+table.data td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+table.data td.wrap { white-space: normal; min-width: 180px; word-break: break-word; }
+
+table.data thead th {
+  position: sticky;
+  top: 0;
+  background: #f7f9fc;
+  font-size: .82rem;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+  color: var(--muted);
+  z-index: 5;
+}
+
+table.data th.sortable { cursor: pointer; user-select: none; }
+table.data th.sortable:hover { color: var(--primary); }
+
+.sort-arrow { display: inline-block; width: 12px; color: var(--primary); }
+
+table.data tbody tr:hover { background: #f8fafd; }
+table.data tfoot td {
+  background: #f7f9fc;
+  font-weight: 700;
+  border-bottom: none;
+}
+
+.totals {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px 4px 0;
+  font-size: 1.02rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.totals .money { color: var(--success-dark); }
+
+/* --- Утилиты ------------------------------------------------------------- */
+
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.grow { flex: 1 1 220px; min-width: 0; }
+.actions-cell { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* --- Десктоп ------------------------------------------------------------- */
+
+@media (min-width: 720px) {
+  .container { padding: 22px 22px 60px; }
+  .card { padding: 22px; }
+  .form-grid.two-col { grid-template-columns: 1fr 1fr; }
+  .form-grid.three-col { grid-template-columns: repeat(3, 1fr); }
+  .filters { grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: end; }
+  .form-actions { flex-direction: row; }
+  .form-actions .btn { width: auto; min-width: 180px; }
+  /* «Применить», «Сбросить», «Экспорт CSV» — строго в один ряд на всю ширину */
+  .filters-actions { flex-wrap: nowrap; }
+  .filters-actions .btn { flex: 1 1 auto; }
+  .timer-face { font-size: 3.4rem; }
+  table.data { min-width: 0; }
+}
+
+@media print {
+  .topbar, .tabs, .filters-actions, .record-actions { display: none; }
+  .card { box-shadow: none; }
+}

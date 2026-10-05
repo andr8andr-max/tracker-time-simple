@@ -1,0 +1,28 @@
+# Секреты и локальные настройки
+.env
+
+# База данных
+data.db
+*.db
+db/*.db
+
+# Звёздочка для Google API (если понадобится интеграция)
+credentials.json
+service-account*.json
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Редакторы и ОС
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+server.log
+server.err
+server.pid

@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2563eb">
+  <title>Панель руководителя — Тайм-трекер</title>
+  <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <span class="topbar-brand">Тайм-трекер · руководитель</span>
+    <div class="topbar-actions">
+      <span class="topbar-user" id="userLabel"></span>
+      <a class="btn btn-sm" href="/">Мой день</a>
+      <button class="btn btn-sm btn-ghost" id="logoutBtn" type="button">Выйти</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <div id="alertBox" hidden></div>
+
+    <nav class="tabs" role="tablist" aria-label="Разделы панели">
+      <button class="tab" id="tabRecords" role="tab" aria-selected="true" type="button">Записи</button>
+      <button class="tab" id="tabEmployees" role="tab" aria-selected="false" type="button">Сотрудники</button>
+      <button class="tab" id="tabProjects" role="tab" aria-selected="false" type="button">Проекты</button>
+    </nav>
+
+    <!-- ========================= ЗАПИСИ ========================= -->
+    <section id="panelRecords">
+      <div class="card">
+        <h1 class="h2">Трудозатраты</h1>
+        <form class="filters" id="filtersForm">
+          <div class="field">
+            <label class="label" for="fFrom">Дата с</label>
+            <input class="input" id="fFrom" type="date">
+          </div>
+          <div class="field">
+            <label class="label" for="fTo">Дата по</label>
+            <input class="input" id="fTo" type="date">
+          </div>
+          <div class="field">
+            <label class="label" for="fUser">Сотрудник</label>
+            <select class="input" id="fUser"></select>
+          </div>
+          <div class="field">
+            <label class="label" for="fProject">Проект</label>
+            <select class="input" id="fProject"></select>
+          </div>
+          <div class="filters-actions">
+            <button class="btn btn-primary" type="submit">Применить</button>
+            <button class="btn" id="resetFilters" type="button">Сбросить</button>
+            <button class="btn" id="exportCsv" type="button">Экспорт CSV</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="table-wrap">
+        <table class="data" id="recordsTable">
+          <caption class="hidden">Таблица трудозатрат</caption>
+        </table>
+      </div>
+
+      <div class="totals" id="totalsBox" hidden>
+        <span id="totalsHours"></span>
+        <span class="money" id="totalsPay"></span>
+      </div>
+
+      <div id="recordsEmpty" class="empty" hidden>По выбранным фильтрам записей нет</div>
+    </section>
+
+    <!-- ======================= СОТРУДНИКИ ======================= -->
+    <section id="panelEmployees" hidden>
+      <div class="card">
+        <h1 class="h2" id="employeeFormTitle">Добавить сотрудника</h1>
+        <form id="employeeForm" class="form-grid two-col" novalidate>
+          <div class="field">
+            <label class="label" for="eFullName">ФИО</label>
+            <input class="input" id="eFullName" type="text" maxlength="120" required
+                   placeholder="Петров Пётр Петрович">
+          </div>
+          <div class="field">
+            <label class="label" for="eLogin">Логин</label>
+            <input class="input" id="eLogin" type="text" maxlength="50" required
+                   autocomplete="off" placeholder="petrov">
+          </div>
+          <div class="field">
+            <label class="label" for="eRole">Роль</label>
+            <select class="input" id="eRole">
+              <option value="user">Сотрудник</option>
+              <option value="admin">Руководитель</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="label" for="eRate">Ставка (руб/час)</label>
+            <input class="input" id="eRate" type="number" min="0" max="1000000" step="0.01"
+                   inputmode="decimal" value="0">
+          </div>
+          <div class="field">
+            <label class="label" for="ePassword">Пароль</label>
+            <input class="input" id="ePassword" type="text" maxlength="200" autocomplete="off"
+                   placeholder="минимум 6 символов">
+            <span class="muted" id="ePasswordHint">При редактировании оставьте пустым, чтобы не менять.</span>
+          </div>
+          <label class="checkbox-row" for="eActive">
+            <input type="checkbox" id="eActive" checked>
+            <span>Активен (может отмечать время)</span>
+          </label>
+
+          <p class="error-text" id="employeeError" hidden></p>
+
+          <div class="form-actions">
+            <button class="btn btn-primary" type="submit" id="employeeSubmit">Создать</button>
+            <button class="btn" type="button" id="employeeCancel" hidden>Отмена</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="table-wrap">
+        <table class="data" id="employeesTable"></table>
+      </div>
+    </section>
+
+    <!-- ========================= ПРОЕКТЫ ======================== -->
+    <section id="panelProjects" hidden>
+      <div class="card">
+        <h1 class="h2" id="projectFormTitle">Добавить проект</h1>
+        <form id="projectForm" class="form-grid" novalidate>
+          <div class="field">
+            <label class="label" for="pName">Название проекта</label>
+            <input class="input" id="pName" type="text" maxlength="120" required
+                   placeholder="Редизайн сайта">
+          </div>
+          <label class="checkbox-row" for="pActive">
+            <input type="checkbox" id="pActive" checked>
+            <span>Активен (доступен в выпадающих списках)</span>
+          </label>
+          <p class="error-text" id="projectError" hidden></p>
+          <div class="form-actions">
+            <button class="btn btn-primary" type="submit" id="projectSubmit">Создать</button>
+            <button class="btn" type="button" id="projectCancel" hidden>Отмена</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="table-wrap">
+        <table class="data" id="projectsTable"></table>
+      </div>
+    </section>
+  </main>
+
+  <script src="/static/js/api.js"></script>
+  <script src="/static/js/admin.js"></script>
+</body>
+</html>

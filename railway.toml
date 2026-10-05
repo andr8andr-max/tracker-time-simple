@@ -1,0 +1,19 @@
+# Конфигурация Railway (https://docs.railway.com/configuration)
+# Подхватывается автоматически при деплое репозитория.
+
+[build]
+builder = "nixpacks"
+# buildCommand не задан: requirements.txt распознаётся автоматически (pip install -r requirements.txt)
+
+[deploy]
+startCommand = "gunicorn -w 2 -b 0.0.0.0:$PORT backend.wsgi:app"
+healthcheckPath = "/health"
+healthcheckTimeout = 60
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3
+
+# ВАЖНО: постоянный диск (Volume) настраивается в дашборде Railway:
+#   Service -> + New -> Volume, Mount path: /data
+# и переменные окружения сервиса:
+#   DATABASE_PATH=/data/data.db
+# Без диска data.db будет утрачен при каждом редеплое/перезапуске.
