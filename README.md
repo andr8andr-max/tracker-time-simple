@@ -366,6 +366,7 @@ sudo certbot --nginx -d tracker.example.com   # HTTPS → и SESSION_COOKIE_SECU
    | `SESSION_COOKIE_SECURE` | `true` (HTTPS на `*.up.railway.app`) |
    | `FLASK_DEBUG` | `false` |
    | `SEED_DATA` | `false` |
+   | `TZ` | часовой пояс сервера, например `Europe/Moscow` (иначе контейнер живёт в UTC, и таймеры уходят на разницу в часы) |
    | `ADMIN_LOGIN` / `ADMIN_PASSWORD` | логин/пароль первого руководителя (или создайте аккаунт на `/login`) |
 
 6. Deploy → откроется домен вида `....up.railway.app`; зайдите под `ADMIN_LOGIN`
