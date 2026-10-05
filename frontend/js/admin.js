@@ -108,6 +108,7 @@ function renderRecords() {
     th.append(el('span', { class: 'sort-arrow', text: arrow }));
     return th;
   });
+  headerCells.push(el('th', { scope: 'col', text: 'Действия' }));
   table.append(el('thead', {}, el('tr', {}, headerCells)));
 
   /* Тело таблицы: только textContent — пользовательский ввод не попадает в HTML */
@@ -137,7 +138,16 @@ function renderRecords() {
       });
     }
 
-    body.append(el('tr', {}, cells));
+    const actions = el(
+      'div',
+      { class: 'actions-cell' },
+      el('button', {
+        class: 'btn btn-sm btn-danger', type: 'button', text: 'Удалить',
+        onClick: () => removeAdminRecord(row),
+      })
+    );
+
+    body.append(el('tr', {}, [...cells, el('td', {}, actions)]));
   }
   table.append(body);
 
@@ -156,6 +166,17 @@ function renderTotals(rows) {
   $('totalsHours').textContent = `Итого: ${formatHours(hours)} ч`;
   $('totalsPay').textContent = `Итого к оплате: ${formatMoney(pay)} ₽`;
   box.hidden = false;
+}
+
+async function removeAdminRecord(row) {
+  if (!window.confirm('Удалить запись? Действие нельзя отменить.')) return;
+  try {
+    await api.del(`/api/admin/records/${row.id}`);
+    flash('success', 'Запись удалена');
+    await loadRecords();
+  } catch (err) {
+    flash('error', err.message);
+  }
 }
 
 async function loadRecords() {

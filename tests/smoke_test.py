@@ -403,6 +403,24 @@ check("фильтр по проекту работает",
 bad_filter = admin.get("/api/admin/records?date_from=31-12-2026")
 check("некорректная дата фильтра -> 400", bad_filter.status_code == 400)
 
+# --------------------------------------- удаление записи из панели руководителя
+victim_rows = admin.get("/api/admin/records?user_id=2").get_json()["records"]
+check("для удаления найдена запись сотрудника", len(victim_rows) > 0, len(victim_rows))
+victim_id = victim_rows[0]["id"]
+
+no_right = user.delete(f"/api/admin/records/{victim_id}")
+check("сотрудник не может удалить запись через админ-API -> 403",
+      no_right.status_code == 403, no_right.status_code)
+
+removed = admin.delete(f"/api/admin/records/{victim_id}")
+check("руководитель удаляет запись -> 200", removed.status_code == 200, removed.status_code)
+check("запись исчезла из таблицы записей",
+      all(r["id"] != victim_id
+          for r in admin.get("/api/admin/records").get_json()["records"]))
+
+again = admin.delete(f"/api/admin/records/{victim_id}")
+check("повторное удаление -> 404", again.status_code == 404, again.status_code)
+
 # ----------------------------------------------------------- справочники
 print("\n== Справочники ==")
 created_emp = admin.post(

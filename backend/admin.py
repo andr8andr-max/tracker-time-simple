@@ -91,6 +91,17 @@ def all_records():
     return jsonify({"records": rows})
 
 
+@admin_bp.delete("/records/<int:record_id>")
+@api_admin_required
+def delete_record(record_id: int):
+    """Удаление записи руководителем — в том числе чужой (из таблицы записей)."""
+    record = query_one("SELECT id FROM records WHERE id = ?", (record_id,))
+    if record is None:
+        return jsonify({"error": "Запись не найдена"}), 404
+    execute("DELETE FROM records WHERE id = ?", (record_id,))
+    return jsonify({"ok": True})
+
+
 # ---------------------------------------------------------------------------
 # Справочник сотрудников (без удаления — только деактивация)
 # ---------------------------------------------------------------------------
