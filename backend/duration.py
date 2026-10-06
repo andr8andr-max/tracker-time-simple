@@ -8,10 +8,43 @@
 что работа закончилась на следующий день (прибавляем 24 часа).
 """
 
+import os
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 _TIME_FORMATS = ("%H:%M", "%H:%M:%S")
 _PAUSE_FORMAT = "%Y-%m-%d %H:%M:%S"
+
+_ZONE_CACHE: dict = {}
+
+
+def _app_zone():
+    """
+    Часовой пояс приложения из переменной TZ (например Europe/Moscow).
+
+    Зону берём через Python zoneinfo, а не через libc: на PaaS glibc
+    зачастую игнорирует TZ и datetime.now() возвращает UTC, тогда как
+    zoneinfo работает везде, где есть tzdata (в т.д. через pip-пакет).
+    """
+    name = os.environ.get("TZ")
+    if name not in _ZONE_CACHE:
+        try:
+            _ZONE_CACHE[name] = ZoneInfo(name)
+        except Exception:  # noqa: BLE001 — некорректная или отсутствующая зона
+            _ZONE_CACHE[name] = None
+    return _ZONE_CACHE[name]
+
+
+def app_now() -> datetime:
+    """Текущие дата и время в часовом поясе приложения."""
+    zone = _app_zone()
+    return datetime.now(zone) if zone else datetime.now()
+
+
+def _app_now_naive() -> datetime:
+    """Те же часы без пояса — для сравнений с наивными метками из БД."""
+    now = app_now()
+    return now.replace(tzinfo=None) if now.tzinfo else now
 
 
 def to_minutes(value: str) -> int:
@@ -82,7 +115,7 @@ def calculate_duration_hours(
 
 def now_iso() -> str:
     """Текущее локальное время в формате 'YYYY-MM-DD HH:MM:SS'."""
-    return datetime.now().strftime(_PAUSE_FORMAT)
+    return app_now().strftime(_PAUSE_FORMAT)
 
 
 def parse_iso(value: str) -> datetime:
@@ -93,7 +126,7 @@ def parse_iso(value: str) -> datetime:
 def pause_delta_seconds(pause_started_at: str) -> int:
     """Сколько секунд идёт текущая пауза (с момента постановки на паузу)."""
     try:
-        delta = datetime.now() - parse_iso(pause_started_at)
+        delta = _app_now_naive() - parse_iso(pause_started_at)
     except (TypeError, ValueError):
         return 0
     return max(int(delta.total_seconds()), 0)
@@ -130,9 +163,9 @@ def break_minutes_total(
 
 def now_hhmm() -> str:
     """Текущее локальное время в формате HH:MM."""
-    return datetime.now().strftime("%H:%M")
+    return app_now().strftime("%H:%M")
 
 
 def today_iso() -> str:
     """Сегодняшняя дата в формате YYYY-MM-DD."""
-    return datetime.now().strftime("%Y-%m-%d")
+    return app_now().strftime("%Y-%m-%d")

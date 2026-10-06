@@ -15,6 +15,7 @@ from flask import Flask, jsonify, redirect, send_from_directory, url_for
 from .admin import admin_bp
 from .auth import auth_bp, bootstrap_admin
 from .db import close_db, init_db, query_one
+from .duration import app_now
 from .records import records_bp
 from .reference import reference_bp
 from .security import (
@@ -153,10 +154,12 @@ def _register_pages(app: Flask) -> None:
 
         return jsonify({
             "status": "ok",
-            "server_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "server_time": app_now().strftime("%Y-%m-%d %H:%M:%S"),
             "server_time_utc": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),
             "tz_env": os.environ.get("TZ"),
             "tzdata_available": tzdata_ok,
+            "libc_tzname": list(time.tzname),
+            "libc_offset_seconds": time.timezone,
         })
 
 

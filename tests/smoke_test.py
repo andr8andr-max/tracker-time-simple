@@ -498,6 +498,29 @@ check("healthcheck", _health["status"] == "ok")
 check("health отдаёт диагностику времени процесса",
       {"server_time", "server_time_utc", "tz_env", "tzdata_available"} <= set(_health), _health)
 
+# app_now() должен считать время по TZ через zoneinfo, а не через libc
+from backend.duration import app_now as _app_now  # noqa: E402
+from zoneinfo import ZoneInfo  # noqa: E402
+
+os.environ["TZ"] = "Europe/Moscow"
+try:
+    ZoneInfo("Europe/Moscow")  # есть ли tzdata в этом окружении
+except Exception:  # noqa: BLE001 — без tzdata проверку пропускаем
+    check("app_now() берёт время из TZ (zoneinfo)", True, "нет tzdata — пропущено")
+else:
+    from datetime import datetime as _dt  # noqa: E402
+
+    _expect = _dt.now(ZoneInfo("Europe/Moscow"))
+    _got = _app_now()
+    _diff_h = abs((_expect.replace(tzinfo=None) - _got.replace(tzinfo=None)).total_seconds())
+    check(
+        "app_now() берёт время из TZ (zoneinfo)",
+        _got.tzinfo is not None and _diff_h <= 60,
+        f"got={_got} expect={_expect}",
+    )
+finally:
+    del os.environ["TZ"]
+
 # ---------------------------------------------------------------------- итог
 print(f"\nПройдено проверок: {PASSED}, упавших: {len(FAILED)}")
 if FAILED:
