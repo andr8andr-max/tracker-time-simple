@@ -291,16 +291,15 @@ async function startWork() {
 }
 
 async function stopTimer(recordId, button) {
-  setBusy(button, true, 'Остановка…');
+  setBusy(button, true, null); // подпись «Завершить работу» не меняется — только блокировка
   try {
     await api.post(`/api/records/${recordId}/stop`);
     flash('success', 'Работа завершена, длительность сохранена');
     await reload();
   } catch (err) {
-    setBusy(button, false);
     handleFormError(null, err, 'Не удалось остановить таймер');
   } finally {
-    button.disabled = false; // кнопка не должна остаться выключенной
+    setBusy(button, false); // снимает блокировку при успехе и при ошибке
   }
 }
 

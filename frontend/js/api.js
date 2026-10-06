@@ -115,16 +115,21 @@ function flash(type, text) {
   }, ttl);
 }
 
-/** Включает/выключает кнопку и показывает состояние «Выполняется…». */
+/** Включает/выключает кнопку. busyText === null — только блокировка, подпись не меняется. */
 function setBusy(button, busy, busyText) {
   if (!button) return;
   if (busy) {
-    button.dataset.label = button.textContent;
+    if (busyText !== null) {
+      button.dataset.label = button.textContent;
+      button.textContent = busyText || 'Подождите…';
+    }
     button.disabled = true;
-    button.textContent = busyText || 'Подождите…';
   } else {
     button.disabled = false;
-    if (button.dataset.label) button.textContent = button.dataset.label;
+    if (button.dataset.label) {
+      button.textContent = button.dataset.label;
+      delete button.dataset.label;
+    }
   }
 }
 
