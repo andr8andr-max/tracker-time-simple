@@ -6,8 +6,9 @@
 
 import os
 import time
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from flask import Flask, jsonify, redirect, send_from_directory, url_for
 
@@ -132,12 +133,31 @@ def _register_pages(app: Flask) -> None:
 
     @app.get("/health")
     def health():
-        """Проверка живости для мониторинга/PaaS."""
+        """
+        Проверка живости + диагностика времени для мониторинга/PaaS.
+
+        Показывает, в каком часовом поясе САМ процесс считает время
+        (server_time), что видит в переменной TZ и доступна ли tzdata —
+        этого достаточно, чтобы найти причину часовых сдвигов.
+        """
         try:
             query_one("SELECT 1 AS ok")
-            return jsonify({"status": "ok"})
         except Exception:  # noqa: BLE001 — база недоступна
             return jsonify({"status": "error"}), 500
+
+        try:
+            ZoneInfo("Europe/Moscow")
+            tzdata_ok = True
+        except Exception:  # noqa: BLE001 — zoneinfo недоступна
+            tzdata_ok = False
+
+        return jsonify({
+            "status": "ok",
+            "server_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "server_time_utc": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),
+            "tz_env": os.environ.get("TZ"),
+            "tzdata_available": tzdata_ok,
+        })
 
 
 def _register_error_handlers(app: Flask) -> None:

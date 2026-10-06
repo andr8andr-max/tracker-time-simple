@@ -493,7 +493,10 @@ check("сотрудник на /admin -> редирект", user.get("/admin").s
 check("админ на /admin -> 200", admin.get("/admin").status_code == 200)
 check("CSS отдаётся", user.get("/static/css/styles.css").status_code == 200)
 check("JS отдаётся", user.get("/static/js/app.js").status_code == 200)
-check("healthcheck", client.get("/health").get_json()["status"] == "ok")
+_health = client.get("/health").get_json()
+check("healthcheck", _health["status"] == "ok")
+check("health отдаёт диагностику времени процесса",
+      {"server_time", "server_time_utc", "tz_env", "tzdata_available"} <= set(_health), _health)
 
 # ---------------------------------------------------------------------- итог
 print(f"\nПройдено проверок: {PASSED}, упавших: {len(FAILED)}")
