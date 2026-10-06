@@ -264,7 +264,11 @@ def create_project():
     if query_one("SELECT id FROM projects WHERE name = ?", (name,)):
         return jsonify({"error": "Проект с таким названием уже существует"}), 409
 
-    project_id = execute("INSERT INTO projects (name) VALUES (?)", (name,))
+    is_active = bool(data.get("is_active", True))
+    project_id = execute(
+        "INSERT INTO projects (name, is_active) VALUES (?, ?)",
+        (name, 1 if is_active else 0),
+    )
     return jsonify({"ok": True, "project": query_one("SELECT * FROM projects WHERE id = ?", (project_id,))}), 201
 
 

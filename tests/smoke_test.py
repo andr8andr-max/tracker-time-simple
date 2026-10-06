@@ -472,6 +472,18 @@ check("деактивированный проект скрыт из форм с
 proj_delete = admin.delete(f"/api/admin/projects/{project_id}")
 check("удаление проекта запрещено -> 403", proj_delete.status_code == 403)
 
+inactive_created = admin.post("/api/admin/projects", json={"name": "Архивный", "is_active": False})
+check("создание проекта со снятой галочкой -> 201",
+      inactive_created.status_code == 201, inactive_created.status_code)
+check("проект создан деактивированным",
+      inactive_created.get_json()["project"]["is_active"] == 0)
+_new_id = inactive_created.get_json()["project"]["id"]
+check("новый деактивированный проект скрыт из списка сотрудников",
+      all(p["id"] != _new_id for p in user.get("/api/projects").get_json()["projects"]))
+check("он виден руководителю в справочнике",
+      any(p["id"] == _new_id and p["is_active"] == 0
+          for p in admin.get("/api/admin/projects").get_json()["projects"]))
+
 # ------------------------------------------------------------------ страницы
 print("\n== HTML-страницы ==")
 check("гость на / -> редирект на /login", client.get("/").status_code == 302)
