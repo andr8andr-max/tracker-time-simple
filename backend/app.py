@@ -5,6 +5,7 @@
 """
 
 import os
+import time
 from datetime import timedelta
 from pathlib import Path
 
@@ -39,8 +40,21 @@ def _load_env() -> None:
             pass
 
 
+def _apply_tz() -> None:
+    """
+    Перечитывает переменную TZ для libc.
+
+    Нужно для PaaS: если переменная появилась ПОСЛЕ старта процесса,
+    libc могла закешировать UTC — datetime.now() продолжил бы считать
+    по нему, и все записи уходили бы на разницу в часы.
+    """
+    if os.environ.get("TZ") and hasattr(time, "tzset"):
+        time.tzset()
+
+
 def create_app() -> Flask:
     _load_env()
+    _apply_tz()
 
     app = Flask(__name__, static_folder=None)
     app.config.update(
