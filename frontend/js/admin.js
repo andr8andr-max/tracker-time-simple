@@ -545,6 +545,7 @@ async function toggleProject(project) {
 }
 
 async function tryDeleteProject(project) {
+  if (!window.confirm(`Удалить проект «${project.name}»? Действие нельзя отменить.`)) return;
   try {
     await api.del(`/api/admin/projects/${project.id}`);
     flash('success', 'Проект удалён');

@@ -248,7 +248,8 @@ ADMIN_NAME=Иванов Иван Иванович
 | GET | `/api/admin/records?date_from&date_to&user_id&project_id` | **admin** | все записи + `pay` |
 | GET/POST/PUT | `/api/admin/employees[/{id}]` | **admin** | справочник сотрудников |
 | GET/POST/PUT | `/api/admin/projects[/{id}]` | **admin** | справочник проектов |
-| DELETE | `/api/admin/employees/{id}` · `/projects/{id}` | **admin** | всегда **403** — только деактивация |
+| DELETE | `/api/admin/employees/{id}` | **admin** | всегда **403** — только деактивация |
+| DELETE | `/api/admin/projects/{id}` | **admin** | удаляет проект; если в нём есть записи — **409** (сначала удалите записи) |
 
 Ошибки возвращаются как `{"error": "человекочитаемое сообщение"}` + HTTP-код;
 фронтенд показывает их в блоке сообщений, без технических крашей.

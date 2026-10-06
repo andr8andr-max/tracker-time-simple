@@ -469,8 +469,29 @@ active_projects = user.get("/api/projects").get_json()["projects"]
 check("деактивированный проект скрыт из форм сотрудника",
       all(p["id"] != project_id for p in active_projects))
 
+# Проект без записей удаляется; с записями — 409, пока их не удалят
 proj_delete = admin.delete(f"/api/admin/projects/{project_id}")
-check("удаление проекта запрещено -> 403", proj_delete.status_code == 403)
+check("удаление проекта без записей -> 200",
+      proj_delete.status_code == 200, proj_delete.status_code)
+check("проект без записей исчез из справочника",
+      all(p["id"] != project_id
+          for p in admin.get("/api/admin/projects").get_json()["projects"]))
+
+busy_delete = admin.delete("/api/admin/projects/1")
+check("проект с записями -> 409", busy_delete.status_code == 409, busy_delete.status_code)
+check("409 объясняет про записи",
+      "запис" in busy_delete.get_json()["error"].lower(), busy_delete.get_json())
+check("проект с записями остался в базе",
+      any(p["id"] == 1
+          for p in admin.get("/api/admin/projects").get_json()["projects"]))
+
+missing_delete = admin.delete("/api/admin/projects/99999")
+check("удаление несуществующего проекта -> 404",
+      missing_delete.status_code == 404, missing_delete.status_code)
+
+role_project_delete = user.delete("/api/admin/projects/1")
+check("сотрудник не может удалить проект -> 403",
+      role_project_delete.status_code == 403, role_project_delete.status_code)
 
 inactive_created = admin.post("/api/admin/projects", json={"name": "Архивный", "is_active": False})
 check("создание проекта со снятой галочкой -> 201",

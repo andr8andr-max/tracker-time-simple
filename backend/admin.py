@@ -302,8 +302,24 @@ def update_project(project_id: int):
 @admin_bp.delete("/projects/<int:project_id>")
 @api_admin_required
 def delete_project(project_id: int):
-    """Удаление проектов запрещено — только деактивация."""
-    return jsonify(
-        {"error": "Удаление проекта запрещено: используйте деактивацию, "
-                  "чтобы не ломать старые записи."}
-    ), 403
+    """
+    Удаление проекта — только если в нём нет ни одной записи.
+
+    Иначе 409: руководитель сначала удаляет все записи проекта,
+    чтобы не потерять историю работы. Деактивация доступна всегда (PUT).
+    """
+    project = query_one("SELECT id, name FROM projects WHERE id = ?", (project_id,))
+    if project is None:
+        return jsonify({"error": "Проект не найден"}), 404
+
+    used = query_one(
+        "SELECT COUNT(*) AS cnt FROM records WHERE project_id = ?", (project_id,)
+    )["cnt"]
+    if used:
+        return jsonify({
+            "error": f"В проекте «{project['name']}» есть записи ({used}). "
+                     "Сначала удалите все записи проекта."
+        }), 409
+
+    execute("DELETE FROM projects WHERE id = ?", (project_id,))
+    return jsonify({"ok": True})
