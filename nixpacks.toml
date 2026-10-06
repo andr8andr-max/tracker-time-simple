@@ -1,0 +1,4 @@
+# Сборка Nixpacks (Railway): без tzdata Python игнорирует переменную TZ
+# и контейнер живёт в UTC — таймеры уходят на разницу в часы.
+[phases.setup]
+aptPkgs = ["tzdata"]
