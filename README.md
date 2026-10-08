@@ -6,6 +6,8 @@
 
 **Стек:** Python 3.10+ · Flask · SQLite · чистые HTML5/CSS3/JS (без фреймворков).
 
+![Панель администратора](images/TimeTracker_admin1.png)
+
 ---
 
 ## 1. Возможности
